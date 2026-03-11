@@ -29,5 +29,5 @@ A **full-stack web application** to manage support tickets, featuring ticket cre
 
 
 ```bash
-git clone https://github.com/MrUniverse369/Support_Ticket_System.git
-cd Support_Ticket_System
+git clone https://github.com/yourusername/support-ticket-system.git
+cd support-ticket-system
