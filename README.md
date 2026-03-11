@@ -27,18 +27,6 @@ A **full-stack web application** to manage support tickets, featuring ticket cre
 
 ---
 
-## Screenshots
-
-![Dashboard Screenshot](link-to-your-screenshot)  
-![Tickets Screenshot](link-to-your-screenshot)  
-
-*(Replace with screenshots of your app for portfolio showcase)*
-
----
-
-## Installation / Setup
-
-1. **Clone the repository**
 
 ```bash
 git clone https://github.com/MrUniverse369/Support_Ticket_System.git
