@@ -1,0 +1,179 @@
+/* Base & Reset */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
+    background: #e6f0ff;
+    color: #333;
+}
+
+header {
+    background: #0052cc;
+    color: white;
+    padding: 25px 20px;
+    text-align: center;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+h1, h2 {
+    margin: 0 0 10px 0;
+    font-weight: 600;
+}
+
+ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+/* Create Ticket Form */
+#create-ticket {
+    background: #ffffff;
+    padding: 25px;
+    margin: 25px auto;
+    width: 90%;
+    max-width: 600px;
+    border-radius: 12px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+}
+
+#create-ticket input, 
+#create-ticket textarea, 
+#create-ticket select {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 12px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+    transition: 0.3s;
+}
+
+#create-ticket input:focus,
+#create-ticket textarea:focus,
+#create-ticket select:focus {
+    border-color: #0052cc;
+    box-shadow: 0 0 8px rgba(0,82,204,0.3);
+    outline: none;
+}
+
+#create-ticket button {
+    padding: 12px 20px;
+    background: #007bff;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+#create-ticket button:hover {
+    background: #0052cc;
+}
+
+/* Dashboard Boxes */
+#dashboard-stats {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    margin-bottom: 15px;
+}
+
+.stat-box {
+    flex: 1 1 22%;
+    background: linear-gradient(145deg, #4facfe, #00f2fe);
+    color: white;
+    padding: 12px;
+    margin: 5px;
+    border-radius: 12px;
+    text-align: center;
+    font-weight: 600;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    font-size: 14px;
+}
+
+/* Bar chart smaller */
+#statusChart {
+    max-width: 90%;
+    margin: 0 auto 20px auto;
+    height: 150px !important;
+}
+
+/* Tickets Section */
+#tickets-section {
+    width: 90%;
+    max-width: 800px;
+    margin: 25px auto;
+}
+
+/* Ticket Card - solid color, clean professional */
+.ticket-card {
+    background: #ffffff; /* solid light blue */
+    margin-bottom: 18px;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+    transition: transform 0.2s, box-shadow 0.2s;
+    
+}
+
+.ticket-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 28px rgba(0,0,0,0.12);
+}
+
+.ticket-card h3 {
+    margin-top: 0;
+    color: #0052cc;
+}
+
+/* Buttons */
+.ticket-card button {
+    margin-right: 10px;
+    margin-top: 12px;
+    padding: 7px 14px;
+    border: none;
+    border-radius: 6px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: 0.3s;
+    color: rgb(0, 0, 0);
+}
+
+.ticket-card button:hover {
+    opacity: 0.85;
+}
+
+.ticket-card button:nth-child(1) { background: #17a2b8; } /* Assign */
+.ticket-card button:nth-child(2) { background: #28a745; } /* Complete */
+
+/* Completed tickets - last 3 visible */
+#completed-ticket-list .ticket-card {
+    display: none;
+    background: #cdd9ff;
+    color: #555;
+    text-decoration: line-through;
+    padding: 20px;
+    margin-bottom: 18px;
+    border-radius: 12px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+}
+
+#completed-ticket-list .ticket-card:nth-last-child(-n+3) {
+    display: block;
+}
+
+/* Status badges */
+.ticket-card p strong {
+    padding: 3px 8px;
+    border-radius: 6px;
+    color: rgb(0, 0, 0);
+    font-size: 13px;
+}
+
+/* Priority badges */
+.ticket-card p:nth-of-type(4) strong {
+    text-transform: uppercase;
+    padding: 3px 6px;
+    border-radius: 6px;
+}

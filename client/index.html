@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Support Ticket System</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <header>
+      <h1>Support Ticket System</h1>
+    </header>
+
+    <!-- Create Ticket Form -->
+    <section id="create-ticket">
+      <h2>Create New Ticket</h2>
+      <form id="create-ticket-form">
+        <input type="text" name="title" placeholder="Ticket Title" required />
+        <textarea
+          name="description"
+          placeholder="Description"
+          required
+        ></textarea>
+        <select name="priority" required>
+          <option value="low">Low</option>
+          <option value="medium">Medium</option>
+          <option value="high">High</option>
+        </select>
+        <button type="submit">Create Ticket</button>
+      </form>
+    </section>
+
+    <!-- Dashboard -->
+    <section id="dashboard-section">
+      <h2>Dashboard Stats</h2>
+      <div id="dashboard-stats">
+        <div class="stat-box" id="total-tickets"></div>
+        <div class="stat-box" id="open-tickets"></div>
+        <div class="stat-box" id="in-progress-tickets"></div>
+        <div class="stat-box" id="completed-tickets"></div>
+      </div>
+      <!-- Bar chart -->
+      <canvas id="statusChart" width="400" height="120"></canvas>
+    </section>
+
+    <!-- Tickets Section -->
+    <section id="tickets-section">
+      <h2>Active Tickets</h2>
+      <ul id="ticket-list"></ul>
+
+      <h2>Completed Tickets</h2>
+      <ul id="completed-ticket-list"></ul>
+    </section>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>
