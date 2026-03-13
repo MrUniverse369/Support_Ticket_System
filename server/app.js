@@ -16,7 +16,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, '../client')));
 
-/* ── Database ─────────────────────────────────────────────── */
+/* ── Database ─────────────────────────────────────────────── *///
 const dbConfig = process.env.DATABASE_URL
   ? {
       connectionString: process.env.DATABASE_URL,
