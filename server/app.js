@@ -115,7 +115,7 @@ app.patch('/api/tickets/:id/assign', asyncHandler(async (req, res) => {
 }));
 
 /* ── SPA fallback — must be AFTER all API routes ─────────── */
-app.get('*', (req, res) =>
+app.get('/{*splat}', (req, res) =>
   res.sendFile(path.join(__dirname, '../client/index.html'))
 );
 
