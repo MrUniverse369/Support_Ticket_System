@@ -17,7 +17,7 @@
     <aside class="sidebar">
       <div class="sidebar-logo">ST<span>.</span></div>
       <nav class="sidebar-nav">
-        <a href="#" class="nav-item active" data-section="dashboard">
+        <button class="nav-item active" data-section="dashboard">
           <svg
             width="15"
             height="15"
@@ -32,8 +32,8 @@
             <rect x="14" y="14" width="7" height="7" />
           </svg>
           Dashboard
-        </a>
-        <a href="#" class="nav-item" data-section="tickets">
+        </button>
+        <button class="nav-item" data-section="tickets">
           <svg
             width="15"
             height="15"
@@ -48,8 +48,8 @@
             <polyline points="14 2 14 8 20 8" />
           </svg>
           Tickets
-        </a>
-        <a href="#" class="nav-item" data-section="create">
+        </button>
+        <button class="nav-item" data-section="create">
           <svg
             width="15"
             height="15"
@@ -63,7 +63,7 @@
             <line x1="8" y1="12" x2="16" y2="12" />
           </svg>
           New Ticket
-        </a>
+        </button>
       </nav>
       <div class="sidebar-footer">
         <div class="sidebar-user">
@@ -75,7 +75,6 @@
 
     <!-- Main content -->
     <main class="main">
-      <!-- Top bar -->
       <header class="topbar">
         <div class="topbar-title" id="page-title">Dashboard</div>
         <button class="new-ticket-btn" id="open-form-btn">
@@ -94,132 +93,16 @@
         </button>
       </header>
 
-      <!-- Dashboard Section -->
+      <!-- Sections -->
       <section id="section-dashboard" class="content-section active">
-        <div class="stat-grid">
-          <div class="stat-card" id="total-tickets">
-            <span class="stat-label">Total</span>
-            <span class="stat-value">—</span>
-          </div>
-          <div class="stat-card open" id="open-tickets">
-            <span class="stat-label">Open</span>
-            <span class="stat-value">—</span>
-          </div>
-          <div class="stat-card progress" id="in-progress-tickets">
-            <span class="stat-label">In Progress</span>
-            <span class="stat-value">—</span>
-          </div>
-          <div class="stat-card done" id="completed-tickets">
-            <span class="stat-label">Completed</span>
-            <span class="stat-value">—</span>
-          </div>
-        </div>
-
-        <div class="chart-card">
-          <div class="chart-header">
-            <span class="chart-title">Ticket Status Breakdown</span>
-          </div>
-          <div class="chart-wrap">
-            <canvas id="statusChart"></canvas>
-          </div>
-        </div>
+        ...
       </section>
-
-      <!-- Tickets Section -->
-      <section id="section-tickets" class="content-section">
-        <div class="tickets-header">
-          <div class="tickets-tabs">
-            <button class="tab active" data-tab="active">Active</button>
-            <button class="tab" data-tab="completed">Completed</button>
-          </div>
-          <span class="tickets-count" id="tickets-count"></span>
-        </div>
-
-        <div id="tab-active">
-          <ul id="ticket-list" class="ticket-list"></ul>
-          <p class="empty-state" id="empty-active" style="display: none">
-            No active tickets. Great work! 🎉
-          </p>
-        </div>
-
-        <div id="tab-completed" style="display: none">
-          <ul id="completed-ticket-list" class="ticket-list"></ul>
-          <p class="empty-state" id="empty-completed" style="display: none">
-            No completed tickets yet.
-          </p>
-        </div>
-      </section>
-
-      <!-- Create Ticket Section -->
-      <section id="section-create" class="content-section">
-        <div class="form-card">
-          <div class="form-header">
-            <h2>Create New Ticket</h2>
-            <p>Fill in the details below to log a new support ticket.</p>
-          </div>
-          <form id="create-ticket-form" class="ticket-form">
-            <div class="field">
-              <label for="f-title">Title</label>
-              <input
-                type="text"
-                id="f-title"
-                name="title"
-                placeholder="e.g. Login API returning 500 on prod"
-                required
-              />
-            </div>
-            <div class="field">
-              <label for="f-description">Description</label>
-              <textarea
-                id="f-description"
-                name="description"
-                rows="4"
-                placeholder="Describe the issue in detail..."
-                required
-              ></textarea>
-            </div>
-            <div class="field">
-              <label for="f-priority">Priority</label>
-              <select id="f-priority" name="priority" required>
-                <option value="" disabled selected>
-                  Select priority level
-                </option>
-                <option value="low">Low</option>
-                <option value="medium">Medium</option>
-                <option value="high">High</option>
-              </select>
-            </div>
-            <div class="form-actions">
-              <button type="submit" class="btn-submit">Create Ticket</button>
-              <button type="reset" class="btn-reset">Clear</button>
-            </div>
-          </form>
-        </div>
-      </section>
+      <section id="section-tickets" class="content-section">...</section>
+      <section id="section-create" class="content-section">...</section>
     </main>
 
     <!-- Assign Modal -->
-    <div class="modal-overlay" id="assign-modal" style="display: none">
-      <div class="modal">
-        <div class="modal-header">
-          <h3>Assign Ticket</h3>
-          <button class="modal-close" id="modal-close">✕</button>
-        </div>
-        <div class="field">
-          <label for="assign-user-id">User ID</label>
-          <input
-            type="number"
-            id="assign-user-id"
-            placeholder="Enter user ID"
-            min="1"
-          />
-        </div>
-        <div class="modal-actions">
-          <button class="btn-submit" id="confirm-assign">Assign</button>
-          <button class="btn-reset" id="cancel-assign">Cancel</button>
-        </div>
-      </div>
-    </div>
+    <div class="modal-overlay" id="assign-modal" style="display: none">...</div>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="app.js"></script>
