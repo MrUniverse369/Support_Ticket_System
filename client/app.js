@@ -280,7 +280,7 @@ createForm.addEventListener('submit', async e => {
     const res = await fetch(`${API_URL}/tickets`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ title, description, priority, created_by: 1 }) // swap 1 for real user ID
+      body: JSON.stringify({ title, description, priority, created_by: null })
     });
     if (!res.ok) throw new Error('Ticket creation failed');
 
