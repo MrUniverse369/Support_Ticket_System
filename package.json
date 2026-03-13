@@ -1,20 +1,24 @@
 {
-  "name": "server",
+  "name": "support-ticket-system",
   "version": "1.0.0",
-  "description": "",
+  "description": "Full-stack Support Ticket System using Node.js, Express, PostgreSQL, HTML, CSS, and JavaScript",
   "main": "index.js",
+  "type": "commonjs",
   "scripts": {
+    "start": "node server/index.js",
+    "dev": "nodemon server/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": ["support", "tickets", "nodejs", "express", "postgresql", "fullstack"],
+  "author": "Thamsanqa Mbano",
   "license": "ISC",
-  "type": "commonjs",
   "dependencies": {
-    "body-parser": "^2.2.2",
     "cors": "^2.8.6",
     "dotenv": "^17.3.1",
     "express": "^5.2.1",
     "pg": "^8.20.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
   }
 }

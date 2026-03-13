@@ -1,54 +1,61 @@
-const express  = require('express');
-const cors     = require('cors');
-const pg       = require('pg');
-const path     = require('path');
+const express = require('express');
+const cors = require('cors');
+const { Client } = require('pg');
+const path = require('path');
 
 require('dotenv').config();
 
-const app  = express();
+const app = express();
 const PORT = process.env.PORT || 3000;
 
 /* ── Middleware ───────────────────────────────────────────── */
+// Enable CORS for cross-origin requests
 app.use(cors());
-app.use(express.json());                              // body-parser is built into Express 4.16+
+
+// Parse JSON bodies (for POST/PUT/PATCH)
+app.use(express.json());
+
+// Parse URL-encoded bodies (for form submissions)
+app.use(express.urlencoded({ extended: true }));
+
+// Serve static front-end files
 app.use(express.static(path.join(__dirname, '../client')));
 
 /* ── Database ─────────────────────────────────────────────── */
-const db = new pg.Client({
-  user:     process.env.DBUSER,
-  host:     process.env.DBHOST,
+// Use DATABASE_URL if on Render, otherwise fallback to local config
+const db = new Client({
+  connectionString: process.env.DATABASE_URL,
+  // Uncomment below for local development
+  /*
+  user: process.env.DBUSER,
+  host: process.env.DBHOST,
   password: process.env.DBPASSWORD,
   database: process.env.DB,
-  port:     process.env.DBPORT,
+  port: process.env.DBPORT,
+  */
 });
 
 db.connect()
   .then(() => console.log('✅ Connected to PostgreSQL'))
   .catch(err => {
     console.error('❌ DB connection failed:', err.message);
-    process.exit(1);                                  // no point running without a DB
+    process.exit(1); // exit if DB connection fails
   });
 
 /* ── Helpers ──────────────────────────────────────────────── */
-
-// Wraps every route so we don't repeat try/catch everywhere
 const asyncHandler = fn => (req, res, next) =>
   Promise.resolve(fn(req, res, next)).catch(next);
 
-// Validates that required body fields are present and non-empty
 function requireFields(fields, body) {
   const missing = fields.filter(f => body[f] === undefined || body[f] === '');
   return missing.length ? missing : null;
 }
 
 /* ── Routes ───────────────────────────────────────────────── */
-
-// Serve frontend
 app.get('/', (req, res) =>
   res.sendFile(path.join(__dirname, '../client/index.html'))
 );
 
-/* ── GET /tickets ─────────────────────────────────────────── */
 app.get('/tickets', asyncHandler(async (req, res) => {
   const result = await db.query(`
     SELECT
@@ -68,10 +75,8 @@ app.get('/tickets', asyncHandler(async (req, res) => {
   res.json(result.rows);
 }));
 
-/* ── POST /tickets ────────────────────────────────────────── */
 app.post('/tickets', asyncHandler(async (req, res) => {
   const { title, description, priority, created_by } = req.body;
-
   const missing = requireFields(['title', 'description', 'priority', 'created_by'], req.body);
   if (missing) return res.status(400).json({ error: `Missing fields: ${missing.join(', ')}` });
 
@@ -89,11 +94,9 @@ app.post('/tickets', asyncHandler(async (req, res) => {
   res.status(201).json(result.rows[0]);
 }));
 
-/* ── PATCH /tickets/:id/assign ────────────────────────────── */
 app.patch('/tickets/:id/assign', asyncHandler(async (req, res) => {
   const { id } = req.params;
   const { assigned_to } = req.body;
-
   if (!assigned_to) return res.status(400).json({ error: 'assigned_to is required' });
 
   const result = await db.query(
@@ -108,7 +111,6 @@ app.patch('/tickets/:id/assign', asyncHandler(async (req, res) => {
   res.json(result.rows[0]);
 }));
 
-/* ── PATCH /tickets/:id/status ────────────────────────────── */
 app.patch('/tickets/:id/status', asyncHandler(async (req, res) => {
   const { id } = req.params;
   const { status } = req.body;
@@ -130,7 +132,6 @@ app.patch('/tickets/:id/status', asyncHandler(async (req, res) => {
   res.json(result.rows[0]);
 }));
 
-/* ── POST /tickets/:id/comments ───────────────────────────── */
 app.post('/tickets/:id/comments', asyncHandler(async (req, res) => {
   const { id } = req.params;
   const { user_id, comment } = req.body;
@@ -147,10 +148,8 @@ app.post('/tickets/:id/comments', asyncHandler(async (req, res) => {
   res.status(201).json(result.rows[0]);
 }));
 
-/* ── GET /tickets/:id/comments ────────────────────────────── */
 app.get('/tickets/:id/comments', asyncHandler(async (req, res) => {
   const { id } = req.params;
-
   const result = await db.query(
     `SELECT
        c.comment_id,
@@ -166,7 +165,6 @@ app.get('/tickets/:id/comments', asyncHandler(async (req, res) => {
   res.json(result.rows);
 }));
 
-/* ── GET /dashboard ───────────────────────────────────────── */
 app.get('/dashboard', asyncHandler(async (req, res) => {
   const result = await db.query(
     `SELECT status, COUNT(*) AS count
@@ -177,7 +175,6 @@ app.get('/dashboard', asyncHandler(async (req, res) => {
 }));
 
 /* ── Global error handler ─────────────────────────────────── */
-// Catches anything thrown inside asyncHandler routes
 app.use((err, req, res, _next) => {
   console.error(`[${req.method} ${req.path}]`, err.message);
   res.status(500).json({ error: 'Internal server error' });
