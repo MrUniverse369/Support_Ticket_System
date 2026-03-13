@@ -196,6 +196,7 @@
     border: 1px solid var(--border);
     border-radius: 12px;
     padding: 22px 24px;
+    
   }
   .chart-header { margin-bottom: 18px; }
   .chart-title {
