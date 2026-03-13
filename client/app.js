@@ -1,3 +1,4 @@
+// server/app.js
 const express = require('express');
 const cors    = require('cors');
 const pg      = require('pg');
@@ -25,10 +26,13 @@ const dbConfig = process.env.DATABASE_URL
     };
 
 const db = new pg.Client(dbConfig);
-db.connect().then(() => console.log('✅ Connected to PostgreSQL')).catch(err => {
-  console.error('❌ DB connection failed:', err.message);
-  process.exit(1);
-});
+
+db.connect()
+  .then(() => console.log('✅ Connected to PostgreSQL'))
+  .catch(err => {
+    console.error('❌ DB connection failed:', err.message);
+    process.exit(1);
+  });
 
 /* ── Helpers ──────────────────────────────────────────────── */
 const asyncHandler = fn => (req, res, next) =>
@@ -39,13 +43,11 @@ function requireFields(fields, body) {
   return missing.length ? missing : null;
 }
 
-/* ── Routes ───────────────────────────────────────────────── */
-app.get('/', (req, res) =>
-  res.sendFile(path.join(__dirname, '../client/index.html'))
-);
+/* ── API Routes ───────────────────────────────────────────── */
+const api = express.Router();
 
-/* ── GET all tickets ─────────────────────────────────────── */
-app.get('/tickets', asyncHandler(async (req, res) => {
+// GET all tickets
+api.get('/tickets', asyncHandler(async (req, res) => {
   const result = await db.query(`
     SELECT t.ticket_id, t.title, t.description, t.priority, t.status, t.created_at,
            u1.name AS created_by, u2.name AS assigned_to
@@ -57,8 +59,8 @@ app.get('/tickets', asyncHandler(async (req, res) => {
   res.json(result.rows);
 }));
 
-/* ── POST create a ticket ────────────────────────────────── */
-app.post('/tickets', asyncHandler(async (req, res) => {
+// POST create a ticket
+api.post('/tickets', asyncHandler(async (req, res) => {
   const missing = requireFields(['title', 'description', 'priority', 'created_by'], req.body);
   if (missing) return res.status(400).json({ error: `Missing fields: ${missing.join(', ')}` });
 
@@ -73,8 +75,8 @@ app.post('/tickets', asyncHandler(async (req, res) => {
   res.status(201).json(result.rows[0]);
 }));
 
-/* ── PATCH update ticket status ─────────────────────────── */
-app.patch('/tickets/:id/status', asyncHandler(async (req, res) => {
+// PATCH update ticket status
+api.patch('/tickets/:id/status', asyncHandler(async (req, res) => {
   const { status } = req.body;
   const { id }     = req.params;
   if (!status) return res.status(400).json({ error: 'Missing status' });
@@ -89,8 +91,8 @@ app.patch('/tickets/:id/status', asyncHandler(async (req, res) => {
   res.json(result.rows[0]);
 }));
 
-/* ── PATCH assign ticket ────────────────────────────────── */
-app.patch('/tickets/:id/assign', asyncHandler(async (req, res) => {
+// PATCH assign ticket
+api.patch('/tickets/:id/assign', asyncHandler(async (req, res) => {
   const { assigned_to } = req.body;
   const { id } = req.params;
 
@@ -106,6 +108,15 @@ app.patch('/tickets/:id/assign', asyncHandler(async (req, res) => {
   res.json(result.rows[0]);
 }));
 
+// Mount API router
+app.use('/api', api);
+
+/* ── SPA Fallback ─────────────────────────────────────────── */
+// Serve index.html for all other routes (frontend routing)
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../client/index.html'));
+});
+
 /* ── Global error handler ─────────────────────────────────── */
 app.use((err, req, res, _next) => {
   console.error(`[${req.method} ${req.path}]`, err.message);
@@ -113,6 +124,6 @@ app.use((err, req, res, _next) => {
 });
 
 /* ── Start Server ─────────────────────────────────────────── */
-app.listen(PORT, () =>
-  console.log(`🚀 Server running on http://localhost:${PORT}`)
-);
+app.listen(PORT, () => {
+  console.log(`🚀 Server running on http://localhost:${PORT}`);
+});
