@@ -3,207 +3,222 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Support Ticket System</title>
+    <title>Queue — Support Tickets</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Manrope:wght@400;500;600;700;800&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300;12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=Fira+Code:wght@400;500&display=swap"
       rel="stylesheet"
     />
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <!-- Sidebar -->
-    <aside class="sidebar">
-      <div class="sidebar-logo">ST<span>.</span></div>
-      <nav class="sidebar-nav">
-        <a href="#" class="nav-item active" data-section="dashboard">
-          <svg
-            width="15"
-            height="15"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            viewBox="0 0 24 24"
-          >
-            <rect x="3" y="3" width="7" height="7" />
-            <rect x="14" y="3" width="7" height="7" />
-            <rect x="3" y="14" width="7" height="7" />
-            <rect x="14" y="14" width="7" height="7" />
-          </svg>
-          Dashboard
-        </a>
-        <a href="#" class="nav-item" data-section="tickets">
-          <svg
-            width="15"
-            height="15"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            viewBox="0 0 24 24"
-          >
-            <path
-              d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
-            />
-            <polyline points="14 2 14 8 20 8" />
-          </svg>
-          Tickets
-        </a>
-        <a href="#" class="nav-item" data-section="create">
-          <svg
-            width="15"
-            height="15"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            viewBox="0 0 24 24"
-          >
-            <circle cx="12" cy="12" r="10" />
-            <line x1="12" y1="8" x2="12" y2="16" />
-            <line x1="8" y1="12" x2="16" y2="12" />
-          </svg>
-          New Ticket
-        </a>
-      </nav>
-      <div class="sidebar-footer">
-        <div class="sidebar-user">
-          <div class="user-avatar">T</div>
-          <span>Thamsanqa</span>
+    <div class="shell">
+      <!-- ── Header ── -->
+      <header class="header">
+        <div class="header-left">
+          <div class="wordmark"><span class="wordmark-q">Q</span>ueue</div>
+          <nav class="header-nav">
+            <button class="hnav-item active" data-section="dashboard">
+              Overview
+            </button>
+            <button class="hnav-item" data-section="tickets">Tickets</button>
+            <button class="hnav-item" data-section="create">+ New</button>
+          </nav>
         </div>
-      </div>
-    </aside>
-
-    <!-- Main content -->
-    <main class="main">
-      <!-- Top bar -->
-      <header class="topbar">
-        <div class="topbar-title" id="page-title">Dashboard</div>
-        <button class="new-ticket-btn" id="open-form-btn">
-          <svg
-            width="13"
-            height="13"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2.5"
-            viewBox="0 0 24 24"
-          >
-            <line x1="12" y1="5" x2="12" y2="19" />
-            <line x1="5" y1="12" x2="19" y2="12" />
-          </svg>
-          New Ticket
-        </button>
+        <div class="header-right">
+          <div class="user-chip">
+            <span class="user-initial">T</span>
+            <span class="user-label">Thamsanqa</span>
+          </div>
+          <button class="mob-menu-btn" id="mob-menu-btn" aria-label="Menu">
+            <span></span><span></span><span></span>
+          </button>
+        </div>
       </header>
 
-      <!-- Dashboard Section -->
-      <section id="section-dashboard" class="content-section active">
-        <div class="stat-grid">
-          <div class="stat-card" id="total-tickets">
-            <span class="stat-label">Total</span>
-            <span class="stat-value">—</span>
-          </div>
-          <div class="stat-card open" id="open-tickets">
-            <span class="stat-label">Open</span>
-            <span class="stat-value">—</span>
-          </div>
-          <div class="stat-card progress" id="in-progress-tickets">
-            <span class="stat-label">In Progress</span>
-            <span class="stat-value">—</span>
-          </div>
-          <div class="stat-card done" id="completed-tickets">
-            <span class="stat-label">Completed</span>
-            <span class="stat-value">—</span>
-          </div>
-        </div>
+      <!-- Mobile nav panel -->
+      <div class="mob-nav" id="mob-nav">
+        <button class="mob-nav-item active" data-section="dashboard">
+          Overview
+        </button>
+        <button class="mob-nav-item" data-section="tickets">Tickets</button>
+        <button class="mob-nav-item" data-section="create">+ New Ticket</button>
+      </div>
 
-        <div class="chart-card">
-          <div class="chart-header">
-            <span class="chart-title">Ticket Status Breakdown</span>
-          </div>
-          <div class="chart-wrap">
-            <canvas id="statusChart"></canvas>
-          </div>
-        </div>
-      </section>
-
-      <!-- Tickets Section -->
-      <section id="section-tickets" class="content-section">
-        <div class="tickets-header">
-          <div class="tickets-tabs">
-            <button class="tab active" data-tab="active">Active</button>
-            <button class="tab" data-tab="completed">Completed</button>
-          </div>
-          <span class="tickets-count" id="tickets-count"></span>
-        </div>
-
-        <div id="tab-active">
-          <ul id="ticket-list" class="ticket-list"></ul>
-          <p class="empty-state" id="empty-active" style="display: none">
-            No active tickets. Great work! 🎉
-          </p>
-        </div>
-
-        <div id="tab-completed" style="display: none">
-          <ul id="completed-ticket-list" class="ticket-list"></ul>
-          <p class="empty-state" id="empty-completed" style="display: none">
-            No completed tickets yet.
-          </p>
-        </div>
-      </section>
-
-      <!-- Create Ticket Section -->
-      <section id="section-create" class="content-section">
-        <div class="form-card">
-          <div class="form-header">
-            <h2>Create New Ticket</h2>
-            <p>Fill in the details below to log a new support ticket.</p>
-          </div>
-          <form id="create-ticket-form" class="ticket-form">
-            <div class="field">
-              <label for="f-title">Title</label>
-              <input
-                type="text"
-                id="f-title"
-                name="title"
-                placeholder="e.g. Login API returning 500 on prod"
-                required
-              />
+      <!-- ── Content ── -->
+      <main class="content">
+        <!-- Page strip -->
+        <div class="page-strip">
+          <div class="page-strip-inner">
+            <div>
+              <h1 class="page-h1" id="page-title">Overview</h1>
+              <p class="page-lead" id="page-lead">
+                All ticket activity at a glance
+              </p>
             </div>
-            <div class="field">
-              <label for="f-description">Description</label>
-              <textarea
-                id="f-description"
-                name="description"
-                rows="4"
-                placeholder="Describe the issue in detail..."
-                required
-              ></textarea>
-            </div>
-            <div class="field">
-              <label for="f-priority">Priority</label>
-              <select id="f-priority" name="priority" required>
-                <option value="" disabled selected>
-                  Select priority level
-                </option>
-                <option value="low">Low</option>
-                <option value="medium">Medium</option>
-                <option value="high">High</option>
-              </select>
-            </div>
-            <div class="form-actions">
-              <button type="submit" class="btn-submit">Create Ticket</button>
-              <button type="reset" class="btn-reset">Clear</button>
-            </div>
-          </form>
+            <button class="cta-btn" id="open-form-btn">New Ticket</button>
+          </div>
         </div>
-      </section>
-    </main>
 
-    <!-- Assign Modal -->
-    <div class="modal-overlay" id="assign-modal" style="display: none">
-      <div class="modal">
-        <div class="modal-header">
-          <h3>Assign Ticket</h3>
-          <button class="modal-close" id="modal-close">✕</button>
+        <!-- ════ DASHBOARD ════ -->
+        <section id="section-dashboard" class="section active">
+          <div class="kpi-row">
+            <div class="kpi-card">
+              <span class="kpi-num" id="kpi-total">—</span>
+              <span class="kpi-lbl">Total</span>
+            </div>
+            <div class="kpi-card kpi-open">
+              <span class="kpi-num" id="kpi-open">—</span>
+              <span class="kpi-lbl">Open</span>
+            </div>
+            <div class="kpi-card kpi-progress">
+              <span class="kpi-num" id="kpi-progress">—</span>
+              <span class="kpi-lbl">In Progress</span>
+            </div>
+            <div class="kpi-card kpi-done">
+              <span class="kpi-num" id="kpi-done">—</span>
+              <span class="kpi-lbl">Completed</span>
+            </div>
+          </div>
+
+          <div class="chart-panel">
+            <div class="panel-head">
+              <span class="panel-title">Status breakdown</span>
+            </div>
+            <div class="chart-area">
+              <canvas id="statusChart"></canvas>
+            </div>
+          </div>
+        </section>
+
+        <!-- ════ TICKETS ════ -->
+        <section id="section-tickets" class="section">
+          <div class="tbl-toolbar">
+            <div class="tab-group">
+              <button class="tbl-tab active" data-tab="active">Active</button>
+              <button class="tbl-tab" data-tab="completed">Completed</button>
+            </div>
+            <span class="tbl-count" id="tickets-count"></span>
+          </div>
+
+          <!-- Active table (desktop) -->
+          <div id="tab-active">
+            <div class="tbl-wrap">
+              <table class="tbl">
+                <thead>
+                  <tr>
+                    <th class="col-id">#</th>
+                    <th class="col-title">Title</th>
+                    <th class="col-pri">Priority</th>
+                    <th class="col-status">Status</th>
+                    <th class="col-assigned">Assigned</th>
+                    <th class="col-date">Created</th>
+                    <th class="col-actions">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="ticket-tbody"></tbody>
+              </table>
+            </div>
+            <p class="empty-tbl" id="empty-active" style="display: none">
+              🎉 All caught up — no active tickets.
+            </p>
+            <!-- Mobile cards -->
+            <div class="mob-cards" id="mob-cards-active"></div>
+          </div>
+
+          <!-- Completed table (desktop) -->
+          <div id="tab-completed" style="display: none">
+            <div class="tbl-wrap">
+              <table class="tbl">
+                <thead>
+                  <tr>
+                    <th class="col-id">#</th>
+                    <th class="col-title">Title</th>
+                    <th class="col-pri">Priority</th>
+                    <th class="col-status">Status</th>
+                    <th class="col-assigned">Assigned</th>
+                    <th class="col-date">Created</th>
+                  </tr>
+                </thead>
+                <tbody id="completed-tbody"></tbody>
+              </table>
+            </div>
+            <p class="empty-tbl" id="empty-completed" style="display: none">
+              📭 No completed tickets yet.
+            </p>
+            <!-- Mobile cards -->
+            <div class="mob-cards" id="mob-cards-completed"></div>
+          </div>
+        </section>
+
+        <!-- ════ CREATE ════ -->
+        <section id="section-create" class="section">
+          <div class="form-outer">
+            <div class="form-card">
+              <h2 class="form-title">Log a ticket</h2>
+              <p class="form-sub">
+                Fill in the details below to add it to the queue.
+              </p>
+              <form id="create-ticket-form">
+                <div class="field">
+                  <label for="f-title">Title</label>
+                  <input
+                    type="text"
+                    id="f-title"
+                    name="title"
+                    placeholder="e.g. Login API returning 500 on prod"
+                    required
+                  />
+                </div>
+                <div class="field">
+                  <label for="f-description">Description</label>
+                  <textarea
+                    id="f-description"
+                    name="description"
+                    rows="4"
+                    placeholder="Describe the issue in detail..."
+                    required
+                  ></textarea>
+                </div>
+                <div class="field">
+                  <label for="f-priority">Priority</label>
+                  <select id="f-priority" name="priority" required>
+                    <option value="" disabled selected>Select level</option>
+                    <option value="low">Low</option>
+                    <option value="medium">Medium</option>
+                    <option value="high">High</option>
+                  </select>
+                </div>
+                <div class="form-btns">
+                  <button type="submit" class="cta-btn">Create Ticket</button>
+                  <button type="reset" class="ghost-btn">Clear</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <!-- ── Assign Modal ── -->
+    <div class="modal-veil" id="assign-modal" style="display: none">
+      <div class="modal-box">
+        <div class="modal-top">
+          <h3>Assign ticket</h3>
+          <button class="modal-x" id="modal-close">
+            <svg
+              width="16"
+              height="16"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.5"
+              viewBox="0 0 24 24"
+            >
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+          </button>
         </div>
         <div class="field">
           <label for="assign-user-id">User ID</label>
@@ -214,14 +229,13 @@
             min="1"
           />
         </div>
-        <div class="modal-actions">
-          <button class="btn-submit" id="confirm-assign">Assign</button>
-          <button class="btn-reset" id="cancel-assign">Cancel</button>
+        <div class="modal-btns">
+          <button class="cta-btn" id="confirm-assign">Assign</button>
+          <button class="ghost-btn" id="cancel-assign">Cancel</button>
         </div>
       </div>
     </div>
 
-    <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="app.js"></script>
   </body>

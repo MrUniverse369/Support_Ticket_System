@@ -1,41 +1,74 @@
 /* ── Config ────────────────────────────────────────────────── */
-const API_URL = '/api'; // same-origin on Render — no need for window.location.origin
-
-/* ── DOM refs ──────────────────────────────────────────────── */
-const navItems   = document.querySelectorAll('.nav-item');
-const sections   = document.querySelectorAll('.content-section');
-const pageTitle  = document.getElementById('page-title');
-const openFormBtn = document.getElementById('open-form-btn');
-const createForm = document.getElementById('create-ticket-form');
+const API_URL = '/api';
 
 /* ── State ─────────────────────────────────────────────────── */
-let allTickets    = [];
-let statusChart   = null;
+let allTickets     = [];
+let statusChart    = null;
 let assignTicketId = null;
 
+/* ── Page meta ──────────────────────────────────────────────── */
+const pageMeta = {
+  dashboard: { title: 'Overview',   lead: 'All ticket activity at a glance' },
+  tickets:   { title: 'Tickets',    lead: 'Manage and action your support queue' },
+  create:    { title: 'New Ticket', lead: 'Log a new issue for the queue' },
+};
+
 /* ══════════════════════════════════════════════════════════════
-   SPA NAVIGATION
+   MOBILE NAV
+══════════════════════════════════════════════════════════════ */
+const mobMenuBtn = document.getElementById('mob-menu-btn');
+const mobNav     = document.getElementById('mob-nav');
+
+mobMenuBtn.addEventListener('click', () => {
+  mobNav.classList.toggle('open');
+  mobMenuBtn.classList.toggle('open');
+});
+document.addEventListener('click', e => {
+  if (!mobMenuBtn.contains(e.target) && !mobNav.contains(e.target)) {
+    mobNav.classList.remove('open');
+    mobMenuBtn.classList.remove('open');
+  }
+});
+
+/* ══════════════════════════════════════════════════════════════
+   NAVIGATION
 ══════════════════════════════════════════════════════════════ */
 function showSection(key) {
-  sections.forEach(sec => sec.classList.remove('active'));
+  // Sections
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
   const target = document.getElementById(`section-${key}`);
   if (target) target.classList.add('active');
 
-  navItems.forEach(btn => btn.classList.remove('active'));
-  const navBtn = Array.from(navItems).find(btn => btn.dataset.section === key);
-  if (navBtn) navBtn.classList.add('active');
+  // Header nav
+  document.querySelectorAll('.hnav-item').forEach(b => b.classList.remove('active'));
+  const hBtn = document.querySelector(`.hnav-item[data-section="${key}"]`);
+  if (hBtn) hBtn.classList.add('active');
 
-  const titles = { dashboard: 'Dashboard', tickets: 'Tickets', create: 'New Ticket' };
-  pageTitle.textContent = titles[key] || key;
+  // Mobile nav
+  document.querySelectorAll('.mob-nav-item').forEach(b => b.classList.remove('active'));
+  const mBtn = document.querySelector(`.mob-nav-item[data-section="${key}"]`);
+  if (mBtn) mBtn.classList.add('active');
+
+  // Page strip
+  const meta = pageMeta[key] || { title: key, lead: '' };
+  document.getElementById('page-title').textContent = meta.title;
+  document.getElementById('page-lead').textContent  = meta.lead;
+
+  // Close mobile nav
+  mobNav.classList.remove('open');
+  mobMenuBtn.classList.remove('open');
 
   if (key === 'dashboard') updateDashboard();
   if (key === 'tickets')   renderTickets();
 }
 
-navItems.forEach(item =>
-  item.addEventListener('click', e => { e.preventDefault(); showSection(item.dataset.section); })
+document.querySelectorAll('.hnav-item').forEach(btn =>
+  btn.addEventListener('click', () => showSection(btn.dataset.section))
 );
-openFormBtn.addEventListener('click', e => { e.preventDefault(); showSection('create'); });
+document.querySelectorAll('.mob-nav-item').forEach(btn =>
+  btn.addEventListener('click', () => showSection(btn.dataset.section))
+);
+document.getElementById('open-form-btn').addEventListener('click', () => showSection('create'));
 
 /* ══════════════════════════════════════════════════════════════
    DATA FETCHING
@@ -43,7 +76,7 @@ openFormBtn.addEventListener('click', e => { e.preventDefault(); showSection('cr
 async function fetchTickets() {
   try {
     const res = await fetch(`${API_URL}/tickets`);
-    if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
+    if (!res.ok) throw new Error(`${res.status}`);
     allTickets = await res.json();
     updateDashboard();
     renderTickets();
@@ -61,10 +94,10 @@ function updateDashboard() {
   const inProgress = allTickets.filter(t => t.status === 'in_progress').length;
   const completed  = allTickets.filter(t => t.status === 'completed').length;
 
-  document.querySelector('#total-tickets .stat-value').textContent      = total;
-  document.querySelector('#open-tickets .stat-value').textContent       = open;
-  document.querySelector('#in-progress-tickets .stat-value').textContent = inProgress;
-  document.querySelector('#completed-tickets .stat-value').textContent  = completed;
+  document.getElementById('kpi-total').textContent    = total;
+  document.getElementById('kpi-open').textContent     = open;
+  document.getElementById('kpi-progress').textContent = inProgress;
+  document.getElementById('kpi-done').textContent     = completed;
 
   renderChart(open, inProgress, completed);
 }
@@ -80,11 +113,11 @@ function renderChart(open, inProgress, completed) {
       datasets: [{
         data: [open, inProgress, completed],
         backgroundColor: [
-          'rgba(30,64,175,0.12)',
+          'rgba(14,165,233,0.12)',
           'rgba(217,119,6,0.12)',
-          'rgba(22,163,74,0.12)'
+          'rgba(101,163,13,0.12)',
         ],
-        borderColor: ['#1e40af', '#d97706', '#16a34a'],
+        borderColor: ['#0ea5e9', '#d97706', '#65a30d'],
         borderWidth: 2,
         borderRadius: 6,
       }]
@@ -96,97 +129,171 @@ function renderChart(open, inProgress, completed) {
       scales: {
         y: {
           beginAtZero: true,
-          ticks: { stepSize: 1, precision: 0 },
-          grid: { color: 'rgba(0,0,0,0.05)' }
+          ticks: {
+            stepSize: 1, precision: 0,
+            color: '#9ca3af',
+            font: { family: "'Fira Code', monospace", size: 11 }
+          },
+          grid: { color: 'rgba(0,0,0,0.05)' },
+          border: { color: 'transparent' }
         },
-        x: { grid: { display: false } }
+        x: {
+          ticks: {
+            color: '#6b7280',
+            font: { family: "'Bricolage Grotesque', sans-serif", size: 12, weight: '600' }
+          },
+          grid: { display: false },
+          border: { color: 'transparent' }
+        }
       }
     }
   });
 }
 
 /* ══════════════════════════════════════════════════════════════
-   TICKET LIST
+   RENDER TICKETS
 ══════════════════════════════════════════════════════════════ */
 function renderTickets() {
   const active    = allTickets.filter(t => t.status !== 'completed');
   const completed = allTickets.filter(t => t.status === 'completed');
 
-  const ticketList      = document.getElementById('ticket-list');
-  const completedList   = document.getElementById('completed-ticket-list');
-  const emptyActive     = document.getElementById('empty-active');
-  const emptyCompleted  = document.getElementById('empty-completed');
-  const countEl         = document.getElementById('tickets-count');
+  const activeBody     = document.getElementById('ticket-tbody');
+  const completedBody  = document.getElementById('completed-tbody');
+  const mobActive      = document.getElementById('mob-cards-active');
+  const mobCompleted   = document.getElementById('mob-cards-completed');
+  const emptyActive    = document.getElementById('empty-active');
+  const emptyCompleted = document.getElementById('empty-completed');
+  const countEl        = document.getElementById('tickets-count');
 
-  ticketList.innerHTML    = '';
-  completedList.innerHTML = '';
+  activeBody.innerHTML    = '';
+  completedBody.innerHTML = '';
+  mobActive.innerHTML     = '';
+  mobCompleted.innerHTML  = '';
 
-  const currentTab = document.querySelector('.tab.active')?.dataset.tab || 'active';
+  const currentTab = document.querySelector('.tbl-tab.active')?.dataset.tab || 'active';
   const count = currentTab === 'active' ? active.length : completed.length;
   countEl.textContent = `${count} ticket${count !== 1 ? 's' : ''}`;
 
-  // Active tab
-  emptyActive.style.display = active.length === 0 ? 'block' : 'none';
-  active.forEach(t => ticketList.appendChild(createTicketCard(t)));
+  // Active
+  const showEmptyActive = active.length === 0;
+  emptyActive.style.display = showEmptyActive ? 'block' : 'none';
+  active.forEach(t => {
+    activeBody.appendChild(buildTableRow(t, false));
+    mobActive.appendChild(buildMobCard(t, false));
+  });
 
-  // Completed tab
-  emptyCompleted.style.display = completed.length === 0 ? 'block' : 'none';
-  completed.forEach(t => completedList.appendChild(createTicketCard(t, true)));
+  // Completed
+  const showEmptyCompleted = completed.length === 0;
+  emptyCompleted.style.display = showEmptyCompleted ? 'block' : 'none';
+  completed.forEach(t => {
+    completedBody.appendChild(buildTableRow(t, true));
+    mobCompleted.appendChild(buildMobCard(t, true));
+  });
 }
 
-function createTicketCard(ticket, isCompleted = false) {
-  const li = document.createElement('li');
-  li.className = 'ticket-card';
+/* ── Table row ─────────────────────────────────────────────── */
+function buildTableRow(ticket, isCompleted) {
+  const tr = document.createElement('tr');
 
-  const statusMap = {
-    open:        '<span class="badge badge-open">Open</span>',
-    in_progress: '<span class="badge badge-progress">In Progress</span>',
-    completed:   '<span class="badge badge-completed">Completed</span>',
-  };
+  const date = new Date(ticket.created_at).toLocaleDateString('en-GB', {
+    day: 'numeric', month: 'short', year: '2-digit'
+  });
+
+  const statusPill = pillHtml(ticket.status, 'status');
+  const priPill    = pillHtml(ticket.priority, 'priority');
+
+  const actionsCols = isCompleted ? '' : `
+    <td class="col-actions">
+      <div class="row-actions">
+        ${ticket.status === 'open'
+          ? `<button class="row-btn row-btn-progress" data-id="${ticket.ticket_id}" data-action="progress">In Progress</button>`
+          : ''}
+        <button class="row-btn row-btn-complete" data-id="${ticket.ticket_id}" data-action="complete">Complete</button>
+        <button class="row-btn row-btn-assign"   data-id="${ticket.ticket_id}" data-action="assign">Assign</button>
+      </div>
+    </td>`;
+
+  tr.innerHTML = `
+    <td class="col-id"><span class="td-id">#${ticket.ticket_id}</span></td>
+    <td class="col-title"><span class="td-title">${ticket.title}</span></td>
+    <td class="col-pri">${priPill}</td>
+    <td class="col-status">${statusPill}</td>
+    <td class="col-assigned">${ticket.assigned_to
+      ? `<span class="pill pill-neutral">👤 ${ticket.assigned_to}</span>`
+      : `<span class="td-none">—</span>`
+    }</td>
+    <td class="col-date"><span class="td-date">${date}</span></td>
+    ${actionsCols}
+  `;
+
+  tr.querySelectorAll('[data-action]').forEach(btn => wireAction(btn));
+  return tr;
+}
+
+/* ── Mobile card ───────────────────────────────────────────── */
+function buildMobCard(ticket, isCompleted) {
+  const div = document.createElement('div');
+  div.className = 'mob-card';
 
   const date = new Date(ticket.created_at).toLocaleDateString('en-GB', {
     day: 'numeric', month: 'short', year: 'numeric'
   });
 
-  const assignedBadge = ticket.assigned_to
-    ? `<span class="badge" style="background:var(--cyan-dim);color:var(--cyan);border:1px solid rgba(2,132,199,0.2)">
-         👤 ${ticket.assigned_to}
-       </span>`
-    : '';
-
-  const actions = isCompleted ? '' : `
-    <div class="ticket-actions">
+  const actionHtml = isCompleted ? '' : `
+    <div class="mob-card-actions">
       ${ticket.status === 'open'
-        ? `<button class="btn-assign btn-progress" data-id="${ticket.ticket_id}" data-action="progress">In Progress</button>`
+        ? `<button class="row-btn row-btn-progress" data-id="${ticket.ticket_id}" data-action="progress">In Progress</button>`
         : ''}
-      <button class="btn-complete" data-id="${ticket.ticket_id}" data-action="complete">Complete</button>
-      <button class="btn-assign"   data-id="${ticket.ticket_id}" data-action="assign">Assign</button>
+      <button class="row-btn row-btn-complete" data-id="${ticket.ticket_id}" data-action="complete">Complete</button>
+      <button class="row-btn row-btn-assign"   data-id="${ticket.ticket_id}" data-action="assign">Assign</button>
     </div>`;
 
-  li.innerHTML = `
-    <div class="ticket-body">
-      <div class="ticket-title">#${ticket.ticket_id} — ${ticket.title}</div>
-      <div class="ticket-desc">${ticket.description}</div>
-      <div class="ticket-meta">
-        ${statusMap[ticket.status] || ''}
-        <span class="badge badge-${ticket.priority}">${ticket.priority}</span>
-        ${assignedBadge}
-        <span style="font-size:0.72rem;color:var(--muted2);font-family:var(--mono)">${date}</span>
+  div.innerHTML = `
+    <div class="mob-card-top">
+      <div>
+        <div class="mob-card-id">#${ticket.ticket_id}</div>
+        <div class="mob-card-title">${ticket.title}</div>
       </div>
+      ${pillHtml(ticket.priority, 'priority')}
     </div>
-    ${actions}
+    <div class="mob-card-desc">${ticket.description}</div>
+    <div class="mob-card-meta">
+      ${pillHtml(ticket.status, 'status')}
+      ${ticket.assigned_to ? `<span class="pill pill-neutral">👤 ${ticket.assigned_to}</span>` : ''}
+      <span class="td-date">${date}</span>
+    </div>
+    ${actionHtml}
   `;
 
-  li.querySelectorAll('[data-action]').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const { id, action } = btn.dataset;
-      if (action === 'progress') updateStatus(id, 'in_progress');
-      if (action === 'complete') updateStatus(id, 'completed');
-      if (action === 'assign')   openAssignModal(id);
-    });
-  });
+  div.querySelectorAll('[data-action]').forEach(btn => wireAction(btn));
+  return div;
+}
 
-  return li;
+/* ── Pill helper ────────────────────────────────────────────── */
+function pillHtml(value, type) {
+  const statusMap = {
+    open:        'pill-open',
+    in_progress: 'pill-progress',
+    completed:   'pill-completed',
+  };
+  const priorityMap = {
+    low:    'pill-low',
+    medium: 'pill-medium',
+    high:   'pill-high',
+  };
+  const cls = type === 'status' ? statusMap[value] : priorityMap[value];
+  const label = value === 'in_progress' ? 'In Progress' : value;
+  return `<span class="pill ${cls || ''}">${label}</span>`;
+}
+
+/* ── Wire action button ─────────────────────────────────────── */
+function wireAction(btn) {
+  btn.addEventListener('click', () => {
+    const { id, action } = btn.dataset;
+    if (action === 'progress') updateStatus(id, 'in_progress');
+    if (action === 'complete') updateStatus(id, 'completed');
+    if (action === 'assign')   openAssignModal(id);
+  });
 }
 
 /* ══════════════════════════════════════════════════════════════
@@ -199,7 +306,7 @@ async function updateStatus(id, status) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ status })
     });
-    if (!res.ok) throw new Error('Failed to update status');
+    if (!res.ok) throw new Error('Failed');
     await fetchTickets();
   } catch (err) {
     console.error('updateStatus:', err);
@@ -215,7 +322,6 @@ function openAssignModal(id) {
   document.getElementById('assign-user-id').value = '';
   document.getElementById('assign-modal').style.display = 'flex';
 }
-
 function closeAssignModal() {
   document.getElementById('assign-modal').style.display = 'none';
   assignTicketId = null;
@@ -223,23 +329,19 @@ function closeAssignModal() {
 
 document.getElementById('modal-close').addEventListener('click', closeAssignModal);
 document.getElementById('cancel-assign').addEventListener('click', closeAssignModal);
-
-// Close modal on backdrop click
 document.getElementById('assign-modal').addEventListener('click', e => {
   if (e.target === e.currentTarget) closeAssignModal();
 });
-
 document.getElementById('confirm-assign').addEventListener('click', async () => {
   const userId = document.getElementById('assign-user-id').value.trim();
   if (!userId) return alert('Please enter a user ID');
-
   try {
     const res = await fetch(`${API_URL}/tickets/${assignTicketId}/assign`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ assigned_to: parseInt(userId, 10) })
     });
-    if (!res.ok) throw new Error('Failed to assign ticket');
+    if (!res.ok) throw new Error('Failed');
     closeAssignModal();
     await fetchTickets();
   } catch (err) {
@@ -251,40 +353,34 @@ document.getElementById('confirm-assign').addEventListener('click', async () => 
 /* ══════════════════════════════════════════════════════════════
    TABS
 ══════════════════════════════════════════════════════════════ */
-document.querySelectorAll('.tab').forEach(tab => {
+document.querySelectorAll('.tbl-tab').forEach(tab => {
   tab.addEventListener('click', () => {
-    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tbl-tab').forEach(t => t.classList.remove('active'));
     tab.classList.add('active');
-
     const isActive = tab.dataset.tab === 'active';
     document.getElementById('tab-active').style.display    = isActive ? 'block' : 'none';
     document.getElementById('tab-completed').style.display = isActive ? 'none'  : 'block';
-
-    renderTickets(); // refresh count label
+    renderTickets();
   });
 });
 
 /* ══════════════════════════════════════════════════════════════
    CREATE TICKET
 ══════════════════════════════════════════════════════════════ */
-createForm.addEventListener('submit', async e => {
+document.getElementById('create-ticket-form').addEventListener('submit', async e => {
   e.preventDefault();
-
   const title       = document.getElementById('f-title').value.trim();
   const description = document.getElementById('f-description').value.trim();
   const priority    = document.getElementById('f-priority').value;
-
   if (!title || !description || !priority) return alert('Please fill all fields');
-
   try {
     const res = await fetch(`${API_URL}/tickets`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ title, description, priority, created_by: 1 })
     });
-    if (!res.ok) throw new Error('Ticket creation failed');
-
-    createForm.reset();
+    if (!res.ok) throw new Error('Failed');
+    document.getElementById('create-ticket-form').reset();
     await fetchTickets();
     showSection('tickets');
   } catch (err) {
