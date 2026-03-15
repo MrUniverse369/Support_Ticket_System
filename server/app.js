@@ -1,6 +1,6 @@
 const express = require('express');
 const cors    = require('cors');
-const { Pool } = require('pg');          // ← Pool, not Client
+const { Pool } = require('pg');
 const path    = require('path');
 
 require('dotenv').config();
@@ -16,7 +16,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, '../client')));
 
-/* ── Database ─────────────────────────────────────────────── *///
+/* ── Database ─────────────────────────────────────────────── */
 const dbConfig = process.env.DATABASE_URL
   ? {
       connectionString: process.env.DATABASE_URL,
@@ -30,22 +30,33 @@ const dbConfig = process.env.DATABASE_URL
       port:     process.env.DBPORT,
     };
 
-const db = new Pool(dbConfig);
+const db = new Pool({
+  ...dbConfig,
+  max: 5,                  // small pool — free tier has connection limits
+  idleTimeoutMillis: 30000,
+  connectionTimeoutMillis: 10000,
+});
 
-// Test the connection once on startup
+// Warm the pool on startup but don't crash if DB is still waking up
 db.connect()
   .then(client => {
     console.log('✅ Connected to PostgreSQL');
     client.release();
   })
   .catch(err => {
-    console.error('❌ DB connection failed:', err.message);
-    process.exit(1);
+    // Log but stay alive — Pool will retry on first real request
+    console.warn('⚠️  Initial DB connect failed (may still be waking up):', err.message);
   });
 
 /* ── Helpers ──────────────────────────────────────────────── */
 const asyncHandler = fn => (req, res, next) =>
   Promise.resolve(fn(req, res, next)).catch(next);
+
+/* ── Health check — used by keep-alive cron ──────────────── */
+app.get('/health', asyncHandler(async (req, res) => {
+  await db.query('SELECT 1');           // also keeps the DB connection warm
+  res.json({ status: 'ok', ts: new Date().toISOString() });
+}));
 
 /* ── API Routes (/api prefix to match the frontend) ──────── */
 

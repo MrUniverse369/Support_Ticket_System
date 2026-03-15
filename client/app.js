@@ -71,17 +71,60 @@ document.querySelectorAll('.mob-nav-item').forEach(btn =>
 document.getElementById('open-form-btn').addEventListener('click', () => showSection('create'));
 
 /* ══════════════════════════════════════════════════════════════
+   COLD-START LOADER
+══════════════════════════════════════════════════════════════ */
+const overlay   = document.getElementById('cold-overlay');
+const coldTitle = document.getElementById('cold-title');
+const coldMsg   = document.getElementById('cold-msg');
+const coldBar   = document.getElementById('cold-bar');
+
+const messages = [
+  [4,  'Waking up the server…',          20],
+  [10, 'Starting the database…',         40],
+  [20, 'Still warming up — almost there…', 60],
+  [35, 'This can take up to a minute\non Render\'s free tier…', 80],
+  [55, 'Hang tight, nearly done…',       92],
+];
+
+let msgTimers = [];
+
+function startLoadingUI() {
+  coldBar.style.width = '5%';
+  messages.forEach(([delay, text, pct]) => {
+    const t = setTimeout(() => {
+      coldMsg.textContent  = text;
+      coldBar.style.width  = pct + '%';
+    }, delay * 1000);
+    msgTimers.push(t);
+  });
+}
+
+function stopLoadingUI() {
+  msgTimers.forEach(clearTimeout);
+  coldBar.style.width     = '100%';
+  coldBar.style.transition = 'width 0.3s ease';
+  coldTitle.textContent   = 'Ready!';
+  coldMsg.textContent     = '';
+  setTimeout(() => overlay.classList.add('hidden'), 350);
+}
+
+/* ══════════════════════════════════════════════════════════════
    DATA FETCHING
 ══════════════════════════════════════════════════════════════ */
-async function fetchTickets() {
+async function fetchTickets(showLoader = false) {
+  if (showLoader) startLoadingUI();
   try {
     const res = await fetch(`${API_URL}/tickets`);
     if (!res.ok) throw new Error(`${res.status}`);
     allTickets = await res.json();
     updateDashboard();
     renderTickets();
+    if (showLoader) stopLoadingUI();
   } catch (err) {
     console.error('fetchTickets:', err);
+    coldTitle.textContent = 'Could not connect';
+    coldMsg.textContent   = 'Check your connection and refresh.';
+    coldBar.style.background = '#e11d48';
   }
 }
 
@@ -392,4 +435,4 @@ document.getElementById('create-ticket-form').addEventListener('submit', async e
 /* ══════════════════════════════════════════════════════════════
    INIT
 ══════════════════════════════════════════════════════════════ */
-fetchTickets();
+fetchTickets(true); // true = show cold-start overlay on first load
