@@ -790,11 +790,12 @@ button { cursor: pointer; font-family: var(--font); }
   /* Hide table, show mob-cards */
   .tbl-wrap { display: none; }
   .mob-cards { display: flex; }
-
-  /* Form */
-  .form-card  { padding: 20px; }
-  .form-btns  { flex-direction: column; }
-  .cta-btn, .ghost-btn { width: 100%; text-align: center; }
+  
+/* Form */
+.form-card  { padding: 20px; }
+.form-btns  { flex-direction: column; }
+.form-btns .cta-btn,
+.form-btns .ghost-btn { width: 100%; text-align: center; }
 
   /* Toolbar */
   .tbl-toolbar { flex-direction: row; }
